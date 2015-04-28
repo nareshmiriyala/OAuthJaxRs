@@ -82,6 +82,6 @@ public class OAuthFilter implements ContainerRequestFilter {
     }
 
     private boolean verifyToken(String token) {
-        return true;
+        return token!=null && token.equals("123455");
     }
 }
