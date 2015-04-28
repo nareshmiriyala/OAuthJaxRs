@@ -78,7 +78,7 @@ public class OAuthFilter implements ContainerRequestFilter {
                 // If no error code then return a standard 401 Unauthorized response
                  throw new NotAuthorizedException("Bearer");
             }else{
-                throw new NotAuthorizedException("Error message:"+errorCode);
+                throw new NotAuthorizedException(ex.getDescription()+" .Error Code:"+errorCode);
             }
            
 //            } catch (OAuthSystemException ex1) {
