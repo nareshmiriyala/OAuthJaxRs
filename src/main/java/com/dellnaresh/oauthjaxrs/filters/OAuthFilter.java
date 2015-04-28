@@ -15,12 +15,14 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import org.apache.oltu.oauth2.common.OAuth;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
+import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
 import org.apache.oltu.oauth2.rs.response.OAuthRSResponse;
 
@@ -63,17 +65,25 @@ public class OAuthFilter implements ContainerRequestFilter {
         } catch (OAuthSystemException ex) {
             Logger.getLogger(OAuthFilter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (OAuthProblemException ex) {
-            try {
+//            try {
                 Logger.getLogger(OAuthFilter.class.getName()).log(Level.SEVERE, null, ex);
-                //build error response
-                OAuthResponse oauthResponse = OAuthRSResponse.errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
-                        .setRealm("Album Example").buildHeaderMessage();
-                
-                response.setHeader(OAuth.HeaderType.WWW_AUTHENTICATE, oauthResponse.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
+//                //build error response
+//                OAuthResponse oauthResponse = OAuthRSResponse.errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
+//                        .setRealm("Album Example").buildHeaderMessage();
+//                
+//                response.setHeader(OAuth.HeaderType.WWW_AUTHENTICATE, oauthResponse.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
+                // Check if the error code has been set
+            String errorCode = ex.getError();
+            if(OAuthUtils.isEmpty(errorCode)){
+                // If no error code then return a standard 401 Unauthorized response
                  throw new NotAuthorizedException("Bearer");
-            } catch (OAuthSystemException ex1) {
-                Logger.getLogger(OAuthFilter.class.getName()).log(Level.SEVERE, null, ex1);
+            }else{
+                throw new NotAuthorizedException("Error message:"+errorCode);
             }
+           
+//            } catch (OAuthSystemException ex1) {
+//                Logger.getLogger(OAuthFilter.class.getName()).log(Level.SEVERE, null, ex1);
+//            }
         }
     }
 
